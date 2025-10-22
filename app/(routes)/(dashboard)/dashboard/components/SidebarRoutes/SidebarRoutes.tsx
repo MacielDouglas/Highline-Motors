@@ -11,7 +11,8 @@ export const SidebarRoutes = () => {
     const {userId } = useAuth()
 
   return (
-    <div className="flex flex-col h-full">
+    <div  className="flex flex-col h-full">
+ 
         <div className="p-2 md:p-6">
             <p className="mb-2 text-stone-500">Geral</p>
             {

@@ -1,5 +1,6 @@
 import React from 'react'
 import { Sidebar } from './dashboard/components/Sidebar'
+import { NavbarDashboard } from './dashboard/components/NavbarDashboard'
 
 const LayoutDashboard = ({children}: {children: React.ReactNode} ) => {
   return (
@@ -8,7 +9,7 @@ const LayoutDashboard = ({children}: {children: React.ReactNode} ) => {
             <Sidebar/>
         </div>
         <div className='w-full h-full xl:ml-80'>
-            Navbarddasborad.....
+         <NavbarDashboard/>
 
             <div className="p-6 h-max">
                 {children}
