@@ -26,10 +26,14 @@ export  function ButtonAddCar() {
     </DialogTrigger>
     <DialogContent>
         <DialogHeader>
+        <DialogTitle>
+            Adicionar novo carro
+        </DialogTitle>
             <DialogDescription>
-               <FormAddCar/>
+                Formulário para adicionar um novo carro ao sistema.        
             </DialogDescription>
         </DialogHeader>
+               <FormAddCar setOpenDialog={setOpenDialog}/>
     </DialogContent>
    </Dialog>
   )

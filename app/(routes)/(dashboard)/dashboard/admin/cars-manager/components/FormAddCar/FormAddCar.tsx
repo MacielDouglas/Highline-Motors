@@ -1,8 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, type Control, type Resolver } from "react-hook-form";
+import axios from "axios";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -18,19 +23,19 @@ import {
   SelectContent,
   SelectTrigger,
   SelectValue,
-  SelectItem, // ✅ import correto
+  SelectItem,
 } from "@/components/ui/select";
 
-import { formSchema } from "./FormAddCar.form";
 import { UploadButton } from "@/utils/uploadthing";
-import { useState } from "react";
+import { formSchema } from "./FormAddCar.form";
+import { FormAddCarProps } from "./FormAddCar.types";
 
-export function FormAddCar() {
-
-    const [photoUpload, setPhotoUpload] = useState(false)
+export function FormAddCar({ setOpenDialog }: FormAddCarProps) {
+  const router = useRouter();
+  const [photoUploaded, setPhotoUploaded] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as unknown as Resolver<z.infer<typeof formSchema>>,
     defaultValues: {
       name: "",
       cv: "",
@@ -42,25 +47,42 @@ export function FormAddCar() {
       type: "",
       isPublish: false,
     },
+    mode: "onChange", // ✅ garante validação em tempo real
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+  const { isValid, isSubmitting } = form.formState;
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      await axios.post("/api/car", values);
+      toast.success("🚗 Veículo criado com sucesso!");
+      setOpenDialog(false);
+      router.refresh(); // ✅ preferível ao reload()
+    } catch (error) {
+      console.error(error);
+      toast.error("❌ Erro ao criar o veículo. Tente novamente.");
+    }
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-8"
+      >
         <div className="grid gap-6 lg:grid-cols-2">
-          {/* Nome do carro */}
+          {/* Nome */}
           <FormField
-            control={form.control}
+            control={form.control as unknown as Control<z.infer<typeof formSchema>>}
             name="name"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Carro</FormLabel>
                 <FormControl>
-                  <Input placeholder="Tesla Model S Plaid" {...field} />
+                  <Input
+                    placeholder="Tesla Model S Plaid"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -69,13 +91,17 @@ export function FormAddCar() {
 
           {/* Potência */}
           <FormField
-            control={form.control}
+            control={form.control as unknown as Control<z.infer<typeof formSchema>>}
             name="cv"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Potência</FormLabel>
+                <FormLabel>Potência (CV)</FormLabel>
                 <FormControl>
-                  <Input placeholder="150" {...field} />
+                  <Input
+                    type="number"
+                    placeholder="150"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -84,14 +110,14 @@ export function FormAddCar() {
 
           {/* Transmissão */}
           <FormField
-            control={form.control}
+            control={form.control as unknown as Control<z.infer<typeof formSchema>>}
             name="transmission"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Transmissão</FormLabel>
                 <Select
                   onValueChange={field.onChange}
-                  value={field.value || ""}
+                  defaultValue={field.value}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -110,49 +136,51 @@ export function FormAddCar() {
 
           {/* Ocupantes */}
           <FormField
-            control={form.control}
+            control={form.control as unknown as Control<z.infer<typeof formSchema>>}
             name="people"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Ocupantes</FormLabel>
                 <Select
                   onValueChange={field.onChange}
-                  value={field.value || ""}
+                  defaultValue={field.value}
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecione a quantidade de ocupantes" />
+                      <SelectValue placeholder="Selecione o número de ocupantes" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="2">2</SelectItem>
-                    <SelectItem value="4">4</SelectItem>
-                    <SelectItem value="5">5</SelectItem>
-                    <SelectItem value="7">7</SelectItem>
+                    {[2, 4, 5, 7].map((num) => (
+                      <SelectItem key={num} value={String(num)}>
+                        {num}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <FormMessage />
               </FormItem>
             )}
           />
-          {/* Combustivel */}
+
+          {/* Combustível */}
           <FormField
-            control={form.control}
+            control={form.control as unknown as Control<z.infer<typeof formSchema>>}
             name="engine"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Combustível</FormLabel>
                 <Select
                   onValueChange={field.onChange}
-                  value={field.value || ""}
+                  defaultValue={field.value}
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecione o tipo de combustível" />
+                      <SelectValue placeholder="Selecione o combustível" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="gasolina">Gasolina</SelectItem>
+                    <SelectItem value="gasoline">Gasolina</SelectItem>
                     <SelectItem value="flex">Flex</SelectItem>
                     <SelectItem value="diesel">Diesel</SelectItem>
                     <SelectItem value="hybrid">Híbrido</SelectItem>
@@ -163,27 +191,28 @@ export function FormAddCar() {
               </FormItem>
             )}
           />
-          {/* Tipo de veículo */}
+
+          {/* Tipo */}
           <FormField
-            control={form.control}
+            control={form.control as unknown as Control<z.infer<typeof formSchema>>}
             name="type"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Tipo</FormLabel>
                 <Select
                   onValueChange={field.onChange}
-                  value={field.value || ""}
+                  defaultValue={field.value}
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecione o tipo de veículo" />
+                      <SelectValue placeholder="Selecione o tipo" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
                     <SelectItem value="sedan">Sedan</SelectItem>
                     <SelectItem value="suv">SUV</SelectItem>
                     <SelectItem value="hatch">Hatch</SelectItem>
-                    <SelectItem value="familia">Familia</SelectItem>
+                    <SelectItem value="familia">Familiar</SelectItem>
                     <SelectItem value="sport">Esportivo</SelectItem>
                   </SelectContent>
                 </Select>
@@ -191,44 +220,71 @@ export function FormAddCar() {
               </FormItem>
             )}
           />
-          {/* Tipo de veículo */}
+
+          {/* Foto */}
           <FormField
-            control={form.control}
+            control={form.control as unknown as Control<z.infer<typeof formSchema>>}
             name="photo"
+            render={() => (
+              <FormItem>
+                <FormLabel>Foto do veículo</FormLabel>
+                <FormControl>
+                  {photoUploaded ? (
+                    <p className="text-sm text-green-500">
+                      ✅ Imagem enviada com sucesso!
+                    </p>
+                  ) : (
+                    <UploadButton
+                      endpoint="photo"
+                      className="rounded-lg bg-slate-600/20 text-slate-800 outline-dotted outline-2"
+                      onClientUploadComplete={(res) => {
+                        const url = res?.[0]?.ufsUrl;
+                        if (url) {
+                          form.setValue("photo", url, { shouldValidate: true });
+                          setPhotoUploaded(true);
+                        }
+                      }}
+                      onUploadError={(error: Error) => {
+                        console.error(error);
+                        toast.error("Erro ao enviar imagem");
+                      }}
+                    />
+                  )}
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Preço */}
+          <FormField
+            control={form.control as unknown as Control<z.infer<typeof formSchema>>}
+            name="priceDay"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Foto veículo</FormLabel>
-
+                <FormLabel>Preço da diária</FormLabel>
                 <FormControl>
-                    {photoUpload ? <p className="text-sm">Imagem enviada</p> : (
-
-
-                        <UploadButton
-                        className="rounded-lg bg-slate-600/20 text-slate-800 outline-dotted outline-2"
-                        {...field}
-                        endpoint="photo"
-                        onClientUploadComplete={(res) => {
-                            form.setValue("photo", res?.[0].url)
-                            
-                            setPhotoUpload(true)
-                        }}
-                        onUploadError={(error: Error) => {
-                            console.log(error)
-                        } }
-                        
-                        />
-                    ) }
+                  <Input
+                    type="number"
+                    step="0.01"
+                    placeholder="120.00"
+                    {...field}
+                  />
                 </FormControl>
-       
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
 
-        <Button type="submit">Submit</Button>
+        <Button
+          type="submit"
+          className="w-full mt-5"
+          disabled={!isValid || isSubmitting}
+        >
+          {isSubmitting ? "Criando..." : "Criar veículo"}
+        </Button>
       </form>
     </Form>
   );
 }
-
