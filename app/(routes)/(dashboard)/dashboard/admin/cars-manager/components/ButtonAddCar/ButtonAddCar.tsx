@@ -20,11 +20,13 @@ export  function ButtonAddCar() {
 
 
   return (
-   <Dialog open={openDialog}>
+ 
+
+   <Dialog open={openDialog} >
     <DialogTrigger asChild>
         <Button className="cursor-pointer" variant="outline" onClick={() => setOpenDialog(true)}>Adicionar novo carro <PlusCircle className="ml-2"/></Button>
     </DialogTrigger>
-    <DialogContent>
+    <DialogContent >
         <DialogHeader>
         <DialogTitle>
             Adicionar novo carro
@@ -36,5 +38,6 @@ export  function ButtonAddCar() {
                <FormAddCar setOpenDialog={setOpenDialog}/>
     </DialogContent>
    </Dialog>
+
   )
 }

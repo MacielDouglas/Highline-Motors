@@ -42,3 +42,72 @@ export const formSchema = z.object({
 
   isPublish: z.boolean().default(false),
 });
+
+export const formFields = [
+  {
+    name: "name",
+    label: "Carro",
+    placeholder: "Tesla Model S Plaid",
+    type: "text",
+  },
+ {
+    name: "cv",
+    label: "Potência (CV)",
+    placeholder: "150",
+    type: "number",
+  },
+  {
+    name: "transmission",
+    label: "Transmissão",
+    type: "select",
+    options: [
+      { value: "manual", label: "Manual" },
+      { value: "automatic", label: "Automático" },
+    ],
+    placeholder: "Selecione o tipo de transmissão",
+  },
+  {
+    name: "people",
+    label: "Ocupantes",
+    type: "select",
+    options: [2, 4, 5, 7].map((n) => ({ value: String(n), label: `${n}` })),
+    placeholder: "Selecione o número de ocupantes",
+  },
+  {
+    name: "engine",
+    label: "Combustível",
+    type: "select",
+    options: [
+      { value: "gasoline", label: "Gasolina" },
+      { value: "flex", label: "Flex" },
+      { value: "diesel", label: "Diesel" },
+      { value: "hybrid", label: "Híbrido" },
+      { value: "electric", label: "Elétrico" },
+    ],
+    placeholder: "Selecione o combustível",
+  },
+  {
+    name: "type",
+    label: "Tipo",
+    type: "select",
+    options: [
+      { value: "sedan", label: "Sedan" },
+      { value: "suv", label: "SUV" },
+      { value: "hatch", label: "Hatch" },
+      { value: "familia", label: "Familiar" },
+      { value: "sport", label: "Esportivo" },
+    ],
+    placeholder: "Selecione o tipo",
+  },
+  {
+    name: "photo",
+    label: "Foto do veículo",
+    type: "upload",
+  },
+  {
+    name: "priceDay",
+    label: "Preço da diária",
+    placeholder: "120.00",
+    type: "number",
+  },
+] as const;

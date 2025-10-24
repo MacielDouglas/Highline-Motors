@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PencilIcon } from "lucide-react";
 import { FormEditCar } from "../FormEditCar";
-// import { DialogTrigger } from "@radix-ui/react-dialog";
+
 
 
 export  function ButtonEditCar(props: ButtonEditCarProps) {
@@ -14,7 +14,7 @@ export  function ButtonEditCar(props: ButtonEditCarProps) {
 
 
   return (
-   <Dialog open={isOpenDialog}>
+   <Dialog open={isOpenDialog} >
     <DialogTrigger asChild>
         <Button variant="outline" onClick={() => setIsOpenDialog(true)}>
             Editar <PencilIcon className="w-4 h-4 ml-2" />
@@ -26,10 +26,11 @@ export  function ButtonEditCar(props: ButtonEditCarProps) {
             <DialogTitle>
                 Formulario
             </DialogTitle>
+        <DialogDescription>
+Formulário para modificar um novo carro ao sistema.
+        </DialogDescription>
         </DialogHeader>
-            <DialogDescription>
                <FormEditCar setIsOpenDialog={setIsOpenDialog} carData={carData} />
-            </DialogDescription>
     </DialogContent>
    </Dialog>
   )

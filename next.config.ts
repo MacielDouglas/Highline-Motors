@@ -4,14 +4,39 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
+        protocol: "https",
         hostname: "utfs.io",
-        port: '',
-        pathname: '/**',
-      }
-    ]
-  }
-  /* config options here */
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "*.ufs.sh",
+        port: "",
+        pathname: "/**",
+      },
+    ],
+  },
 };
 
+
 export default nextConfig;
+
+
+// import type { NextConfig } from "next";
+
+// const nextConfig: NextConfig = {
+//   images: {
+//     remotePatterns: [
+//       {
+//         protocol: 'https',
+//         hostname: "utfs.io",
+//         port: '',
+//         pathname: '/**',
+//       }
+//     ]
+//   }
+//   /* config options here */
+// };
+
+// export default nextConfig;
