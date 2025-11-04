@@ -1,16 +1,29 @@
-import React from 'react'
+import { db } from "@/lib/db";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+import { ListCars } from "./components/ListCars";
 
-const DashboardPage = () => {
+export default async function DashboardPage() {
+  const { userId } = await auth();
+
+  if (!userId) return redirect("/");
+
+  const cars = await db.car.findMany({
+    where: {
+      isPublish: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
   return (
     <div>
       <div className="flex justify-between">
-        <h2 className="text-2xl font-bold">
-          Lista de Veículos
-        </h2>
+        <h2 className="text-2xl font-bold">Lista de Veículos</h2>
       </div>
-      <p>Lista de carros</p>
-    </div>
-  )
-}
 
-export default DashboardPage
+      <ListCars cars={cars} />
+    </div>
+  );
+}

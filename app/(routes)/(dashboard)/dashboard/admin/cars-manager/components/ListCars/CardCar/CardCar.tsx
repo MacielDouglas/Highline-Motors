@@ -34,7 +34,7 @@ export function CardCar(props: CardCarProps) {
       }
       router.refresh();
     } catch (error) {
-      toast.error("Erro ao publicar o carro.: ", error);
+      toast.error("Erro ao publicar o carro.: ");
     }
   };
 
