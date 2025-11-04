@@ -4,29 +4,30 @@ import React from "react";
 import { ListCarsProps } from "./ListCar.types";
 import { Car } from "@/lib/generated/prisma/client";
 import Image from "next/image";
-import { Fuel, Gem, Heart, Users2, Wrench } from "lucide-react";
+import { Fuel, Gauge, Gem, Heart, Users2, Wrench } from "lucide-react";
 import { ModalReservation } from "@/components/Shared/ModalAddReservation";
+import { favoriteCars } from "@/hooks/favoritos-carros";
 
 export function ListCars(props: ListCarsProps) {
   const { cars } = props;
+  const { addFavoriteItem, favoriteItems, removeFavoriteItem } = favoriteCars();
+
   return (
     <div className="grid grid-cols-2 gap-6 lg:grid-cols-4">
       {cars.map((car: Car) => {
         const {
           priceDay,
           photo,
-          createdAt,
           cv,
           engine,
           name,
           id,
-          isPublish,
           people,
           transmission,
           type,
-          updatedAt,
-          userId,
         } = car;
+
+        const likedCar = favoriteItems.some((item) => item.id === car.id);
 
         return (
           <div key={id} className="p-1 shadow-md hover:shadow-lg">
@@ -58,10 +59,21 @@ export function ListCars(props: ListCarsProps) {
                 <Fuel className="w-4 h-4 mr-2" strokeWidth={1} />
                 {engine}
               </p>
+              <p className="flex items-center">
+                <Gauge className="w-4 h-4 mr-2" strokeWidth={1} />
+                {cv} CV
+              </p>
 
-              <div className="flex items-center justify-center gap-x-3">
+              <div className="flex items-center justify-center gap-x-3 ">
                 <ModalReservation car={car} />
-                <Heart className="mt-2 cursor-pointer" onClick={() => {}} />
+                <Heart
+                  className={`mt-2 cursor-pointer ${likedCar && "fill-black"}`}
+                  onClick={
+                    likedCar
+                      ? () => removeFavoriteItem(car.id)
+                      : () => addFavoriteItem(car)
+                  }
+                />
               </div>
             </div>
           </div>

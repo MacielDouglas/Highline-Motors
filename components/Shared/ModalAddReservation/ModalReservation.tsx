@@ -36,7 +36,7 @@ export function ModalReservation(props: ModalReservationProps) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="outline" className="w-full mt-3">
+        <Button variant="outline" className=" mt-3">
           Reservar veículo
         </Button>
       </AlertDialogTrigger>
