@@ -18,8 +18,12 @@ import { CalendarSelector } from "./CalendarSelector";
 import { useState } from "react";
 import { addDays } from "date-fns";
 import { DateRange } from "react-day-picker";
+import axios from "axios";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export function ModalReservation(props: ModalReservationProps) {
+  const router = useRouter();
   const { car } = props;
   const [dateSelected, setDateSelected] = useState<{
     from: Date | undefined;
@@ -30,7 +34,27 @@ export function ModalReservation(props: ModalReservationProps) {
   });
 
   const onReserveCar = async (car: Car, dateSelected: DateRange) => {
-    console.log("reserve car.");
+    try {
+      const response = await axios.post("/api/checkout", {
+        carId: car.id,
+        priceDay: car.priceDay,
+        startDate: dateSelected.from,
+        endDate: dateSelected.to,
+        carName: car.name,
+      });
+
+      // Verifique se a resposta indica sucesso no servidor
+      if (response.status === 200) {
+        toast.success("Carro reservado com sucesso!");
+        // Agora redireciona para a página de confirmação
+        router.push("/order-confirmation");
+      } else {
+        toast.error("Falha ao reservar o carro.");
+      }
+    } catch (error) {
+      console.error("Erro ao reservar carro:", error);
+      toast.error("Erro ao reservar o carro.");
+    }
   };
 
   return (
